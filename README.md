@@ -10,6 +10,6 @@ Fake Artist Role Assignment and Theme/Title generator
 
 -Allows for accomplice roll, when checked accomplice will see theme/title like Real Artist, their job is to give as much info as possible to fake artist without revealing their role to real artists.
 
--Scoring: 1pt if Real Artists succeed in voting out Fake Artist AND they have failed to guess title. If Fake Artist failed to get majority vote, OR if they are voted     majority can guess the title are awarded 2 points.  Accomplice will win 1 point if Fake Artist wins.
+-Scoring: 1pt if Real Artists succeed in voting out Fake Artist AND they have failed to guess title. If Fake Artist failed to get majority vote, OR if they are voted majority and can guess the title are awarded 2 points.  Accomplice will win 1 point if Fake Artist wins.
 
 -Fake artist incapable (unless mathematically impossible) to be duplicated consecutive rounds.
