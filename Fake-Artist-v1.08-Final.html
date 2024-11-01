@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* General responsive styles - KNOWN ISSUES: Adding new player after a round, fumbles role assignment*/
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #e0f7fa; /* Light Cyan */
+            padding: 10px;
+            margin: 0;
+            color: #333;
+        }
+
+        /* Container styling for desktop and mobile */
+        .container {
+            max-width: 600px; /* Limits width on desktop */
+            width: 100%; /* Full width on mobile */
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        /* Text and title adjustments */
+        h1, h3 {
+            text-align: center;
+            color: #333;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 1.5em;
+        }
+
+        h3 {
+            font-size: 1.2em;
+            color: #444;
+        }
+
+        /* Player input section adjustments */
+        .player-input, #theme-section, .roles-section {
+            width: 100%; /* Full width on mobile */
+            box-sizing: border-box;
+        }
+
+        .player-input {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .player-input input {
+            flex: 1;
+            padding: 10px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+            font-size: 1em;
+        }
+
+        .player-input input:focus {
+            border-color: #66bb6a;
+            outline: none;
+        }
+
+        .player-color {
+            width: 20%;
+            height: 40px;
+            border-radius: 5px;
+            border: 1px solid #000;
+            margin-left: 10px;
+        }
+
+        /* Button styling */
+        .button {
+            width: 100%;
+            padding: 10px;
+            background-color: #b2ebf2;
+            color: #333;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px 0;
+            font-weight: 600;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #ffccbc;
+        }
+
+        .button:disabled {
+            background-color: #ffe082;
+            cursor: not-allowed;
+        }
+
+        /* Sections for roles, reveal, and score */
+        .roles-section, .reveal-section, .score-section, .reset-section {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .player-reveal {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        .player-reveal p {
+            font-size: 18px;
+        }
+
+        .score-board {
+            margin-top: 20px;
+        }
+
+        .score-board p {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .color-box {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            margin-right: 5px;
+        }
+
+        /* Abandon Round button */
+        .abandon-button {
+            background-color: #d9534f;
+            color: white;
+            font-size: 12px;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            display: block;
+            margin: 10px auto 0;
+            width: auto;
+        }
+
+        /* Player number display */
+        #player-number {
+            font-size: 14px;
+            color: black;
+        }
+
+        /* Navigation buttons */
+        .nav-button {
+            background-color: #6c757d;
+            color: white;
+            font-size: 18px;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            position: absolute;
+            bottom: 45px;
+        }
+
+        #prev-button {
+            left: 10px;
+        }
+
+        #next-button {
+            right: 10px;
+        }
+
+        /* Adjustments for smaller screens */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px; /* Reduced padding for mobile */
+            }
+
+            h1 {
+                font-size: 1.4em;
+            }
+
+            .button, .nav-button {
+                padding: 8px;
+                font-size: 0.9em;
+            }
+
+            .roles-section .nav-button {
+                width: 45%; /* Smaller width for navigation buttons on mobile */
+                font-size: 0.9em;
+            }
+
+            .player-color {
+                width: 100%; /* Full width for mobile */
+                margin: 5px 0;
+            }
+        }
+    </style>
+
+
+</head>
+<body>
+
+<div class="container">
+    <h1>A Fake Artist Goes to Bali</h1>
+
+    <!-- Player Input Section -->
+    <div id="player-section">
+        <h3>Enter Player Names and Colors</h3>
+        <div id="player-inputs">
+            <div class="player-input">
+                <input type="text" placeholder="Player 1 Name" class="player-name">
+                <input type="color" value="#ff66b2" class="player-color">
+            </div>
+        </div>
+        <button class="button" onclick="addPlayerInput()">Add Player</button>
+        <button class="button" onclick="startGame()" id="start-button" disabled>Start Game</button>
+    </div>
+
+    <!-- Theme and Name Input Section -->
+    <div id="theme-section" style="display:none;">
+        <h3>Set Theme and Specific Name</h3>
+        <label for="automate-clues">Automate Clues</label>
+        <input type="checkbox" id="automate-clues">
+        <br>
+        <br>
+        <input type="text" id="theme" placeholder="Enter Theme (e.g., Animal)">
+        <input type="text" id="specific-name" placeholder="Enter Specific Name (e.g., Giraffe)">
+        <br>
+        <br>
+        <button class="button" onclick="assignRoles()">Assign Roles</button>
+        <label for="num-fake-artists">#F:</label>
+        <select id="num-fake-artists">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="debug">debug</option>
+        </select>
+        <label for="accomplice" style="margin-left: 10px;">Accomplice</label>
+        <input type="checkbox" id="accomplice">
+    </div>
+
+    <!-- Reveal Roles Section (with player number and navigation) -->
+    <div class="roles-section" id="roles-section">
+        <div class="player-reveal" id="player-reveal">
+            <!-- Display player number in the top right -->
+            <div id="player-number" style="position: absolute; top: 10px; right: 10px; font-weight: bold;"></div>
+        
+            <p id="current-player-name"></p>
+            <p><strong>Theme:</strong> <span id="theme-display"></span></p>
+
+            <!-- Navigation buttons for previous and next players -->
+            <button class="nav-button" onclick="previousPlayer()" id="prev-button">&lt;</button>
+            <button class="button" onclick="revealRole()" id="reveal-button">Reveal Role</button>
+            <button class="nav-button" onclick="nextPlayer()" id="next-button">&gt;</button>
+        
+            <p id="role-reveal" style="display:none;"></p>
+            <button class="button" onclick="nextPlayer()" id="continue-button" style="display:none;">Continue</button>
+        </div>
+        <!-- Abandon Round Button Positioned Outside the Color Box -->
+        <button class="button abandon-button" onclick="abandonRound()">Abandon Round</button>
+    </div>
+
+    <!-- Score Section (Move Reset Buttons Here) -->
+    <div class="score-section" id="score-section">
+        <h3>Round Result</h3>
+        <button class="button" onclick="artistWins()">Artists Won</button>
+        <button class="button" onclick="fakeArtistWins()">Fake Artist Won</button>
+        <div class="score-board" id="score-board"></div>
+        <button class="button" onclick="startNewRound()">Start New Round</button>
+        <!-- Move Reset Buttons Here -->
+        <button class="button" onclick="resetScores()" style="margin-top: 10px;">Reset Scores</button>
+        <button class="button" onclick="resetAll()" style="margin-top: 10px;">Reset All</button>
+    </div>
+
+
+<script>
+    let players = [];
+    let roles = [];
+    let scores = {};
+    let currentPlayerIndex = 0;
+    let fakeArtistIndex = -1;
+    let storedTheme = '';       // Global variable to store theme
+    let storedSpecificName = ''; // Global variable to store specific name
+    let previousFakeArtists = []; // Array to track Fake Artist(s) from the previous round
+
+    const defaultColors = ['#ff66b2', '#ff0000', '#964B00', '#ffa500', '#008000', '#00008b', '#add8e6', '#000000', '#800080', '#ffff00'];
+
+    // Add new player input
+    function addPlayerInput() {
+        const playerInputs = document.getElementById("player-inputs");
+        const playerCount = playerInputs.children.length + 1;
+
+        if (playerCount > 10) return;
+
+        const newInput = document.createElement("div");
+        newInput.classList.add("player-input");
+        newInput.innerHTML = `
+            <input type="text" placeholder="Player ${playerCount} Name" class="player-name">
+            <input type="color" value="${defaultColors[playerCount - 1] || '#ffffff'}" class="player-color">
+        `;
+        playerInputs.appendChild(newInput);
+
+        // Enable the start button if we have at least 4 players
+        if (playerCount >= 4) {
+            document.getElementById("start-button").disabled = false;
+        }
+    }
+
+    // Start game and move to theme section
+    function startGame() {
+        const playerInputs = document.getElementsByClassName("player-input");
+        players = [];
+
+        // Collect player names and colors
+        for (let input of playerInputs) {
+            const name = input.querySelector(".player-name").value.trim();
+            const color = input.querySelector(".player-color").value;
+            if (name) {
+                players.push({ name, color });
+                if (!(name in scores)) {
+                    scores[name] = 0; // Initialize scores if not already
+                }
+            }
+        }
+
+        if (players.length >= 4) {
+            document.getElementById("player-section").style.display = "none";
+            document.getElementById("theme-section").style.display = "block";
+            document.getElementById("reset-section").style.display = "block";
+        }
+    }
+
+    // Function to fetch and parse CSV data
+    async function getRandomClue() {
+        const response = await fetch('./Fake-Artist-Sample1.csv');
+        const data = await response.text();
+
+        // Parse CSV data
+        const rows = data.trim().split('\n').map(row => row.split(',').map(cell => cell.trim()));
+        const randomIndex = Math.floor(Math.random() * rows.length);
+        const randomRow = rows[randomIndex];
+
+        // Check if randomRow has both theme and specific name fields
+        if (randomRow.length >= 2) {
+            return { theme: randomRow[0], specificName: randomRow[1] };
+        } else {
+            console.error("Invalid row format in CSV:", randomRow);
+            return { theme: "", specificName: "" };
+        }
+    }
+
+
+    // Update assignRoles function to use automated or manual clues, check accomplice, non-duplicate fake artist consecutive is possible
+    async function assignRoles() {
+        const automateClues = document.getElementById("automate-clues").checked;
+
+        if (automateClues) {
+            const clue = await getRandomClue();
+            storedTheme = clue.theme;
+            storedSpecificName = clue.specificName;
+        } else {
+            storedTheme = document.getElementById("theme").value.trim();
+            storedSpecificName = document.getElementById("specific-name").value.trim();
+
+            if (!storedTheme || !storedSpecificName) {
+                alert("Please provide a theme and specific name.");
+                return;
+            }
+        }
+
+        const numFakeArtistsOption = document.getElementById("num-fake-artists").value;
+        const accompliceChecked = document.getElementById("accomplice").checked;
+        roles = Array(players.length).fill("Real Artist");
+
+        let newFakeArtists = [];
+
+        if (numFakeArtistsOption === "debug") {
+            roles.fill("Fake Artist");
+            newFakeArtists = roles.map((_, idx) => idx);
+        } else {
+            const numFakeArtists = Math.min(parseInt(numFakeArtistsOption, 10), players.length);
+            let attempts = 0;
+        
+            while (newFakeArtists.length < numFakeArtists && attempts < 100) {
+                const randomIndex = Math.floor(Math.random() * players.length);
+                if (roles[randomIndex] !== "Fake Artist" && !previousFakeArtists.includes(randomIndex)) {
+                    roles[randomIndex] = "Fake Artist";
+                    newFakeArtists.push(randomIndex);
+                }
+                attempts++;
+            }
+        
+            // If unable to find unique Fake Artists, fall back to allow any player
+            while (newFakeArtists.length < numFakeArtists) {
+                const randomIndex = Math.floor(Math.random() * players.length);
+                if (roles[randomIndex] !== "Fake Artist") {
+                    roles[randomIndex] = "Fake Artist";
+                    newFakeArtists.push(randomIndex);
+                }
+            }
+        }
+
+        if (accompliceChecked) {
+            let accompliceAssigned = false;
+            while (!accompliceAssigned) {
+                const randomIndex = Math.floor(Math.random() * players.length);
+                if (roles[randomIndex] === "Real Artist") {
+                    roles[randomIndex] = "Accomplice";
+                    accompliceAssigned = true;
+                }
+            }
+        }
+
+        document.getElementById("theme-section").style.display = "none";
+        document.getElementById("roles-section").style.display = "block";
+        document.getElementById("theme-display").textContent = storedTheme;
+
+        // Update previousFakeArtists for the next round
+        previousFakeArtists = [...newFakeArtists];
+
+        revealNextPlayer();
+    }
+
+    function revealRole() {
+        const role = roles[currentPlayerIndex];
+        console.log("Specific Name in revealRole:", storedSpecificName); // Debugging log
+
+        let roleText = `Your role is: ${role}`;
+        if (role === "Real Artist" || role === "Accomplice") {
+            roleText += ` (Draw: ${storedSpecificName})`;
+        }
+
+        document.getElementById("role-reveal").textContent = roleText;
+        document.getElementById("role-reveal").style.display = "block";
+        document.getElementById("reveal-button").style.display = "none";
+        document.getElementById("continue-button").style.display = "block";
+    }
+
+
+    // Function to calculate luminance and set text color based on brightness
+    function setTextColorBasedOnBackground(color) {
+        // Convert hex color to RGB
+        const r = parseInt(color.slice(1, 3), 16) / 255;
+        const g = parseInt(color.slice(3, 5), 16) / 255;
+        const b = parseInt(color.slice(5, 7), 16) / 255;
+
+        // Calculate relative luminance
+        const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+        // Set text color based on luminance
+        if (luminance < 0.5) {
+            document.getElementById("player-reveal").style.color = "#FFFFFF"; // Light text for dark backgrounds
+        } else {
+            document.getElementById("player-reveal").style.color = "#000000"; // Dark text for light backgrounds
+        }
+    }
+
+    // Update revealNextPlayer to store specificName
+    function revealNextPlayer() {
+        const currentPlayer = players[currentPlayerIndex];
+        const playerColor = currentPlayer.color;
+
+        document.getElementById("player-reveal").style.backgroundColor = playerColor;
+        setTextColorBasedOnBackground(playerColor);
+
+        document.getElementById("current-player-name").textContent = `Player: ${currentPlayer.name}`;
+        document.getElementById("role-reveal").style.display = "none";
+        document.getElementById("reveal-button").style.display = "block";
+        document.getElementById("continue-button").style.display = "none";
+    }
+
+
+    // Show the player number in X/Y format
+    function updatePlayerNumberDisplay() {
+        document.getElementById("player-number").textContent = `${currentPlayerIndex + 1}/${players.length}`;
+    }
+
+    // Go to the previous player without revealing role
+    function previousPlayer() {
+        if (currentPlayerIndex > 0) {
+            currentPlayerIndex--;
+            revealNextPlayer(); // Update display without showing the role
+            updatePlayerNumberDisplay(); // Update player number display
+        }
+    }
+    // Go to the next player without revealing role (same as nextPlayer but without role reveal)
+    function nextPlayer() {
+        if (currentPlayerIndex < players.length - 1) {
+            currentPlayerIndex++;
+            revealNextPlayer();
+            updatePlayerNumberDisplay();
+        } else {
+            endRound(); // Ends the round if the last player has completed the reveal phase
+        }
+    }
+
+    // End the round and display result options
+    function endRound() {
+        document.getElementById("roles-section").style.display = "none";
+        document.getElementById("score-section").style.display = "block";
+    }
+
+    // Award points if the Real Artists win
+    function artistWins() {
+        for (let i = 0; i < players.length; i++) {
+            if (roles[i] === "Real Artist") {
+                scores[players[i].name] += 1; // Award 1 point to each Real Artist
+            }
+        }
+        displayScores();
+    }
+
+    // Award points if the Fake Artists / accomplice win
+    function fakeArtistWins() {
+        for (let i = 0; i < players.length; i++) {
+            if (roles[i] === "Fake Artist") {
+                scores[players[i].name] += 2; // 2 points for each Fake Artist
+            } else if (roles[i] === "Accomplice") {
+                scores[players[i].name] += 1; // 1 point for the Accomplice
+            }
+        }
+        displayScores();
+    }
+
+
+    // Display the current scores
+    function displayScores() {
+        const scoreBoard = document.getElementById("score-board");
+        scoreBoard.innerHTML = "";
+
+        for (let player of players) {
+            const scoreLine = document.createElement("p");
+            scoreLine.innerHTML = `<span class="color-box" style="background-color:${player.color}"></span>${player.name}: ${scores[player.name]} points`;
+            scoreBoard.appendChild(scoreLine);
+        }
+    }
+    // Reset to the initial state for starting a new round
+    function abandonRound() {
+        currentPlayerIndex = 0;
+        document.getElementById("roles-section").style.display = "none";
+        document.getElementById("theme-section").style.display = "block";
+}
+    // Start a new round
+    function startNewRound() {
+        currentPlayerIndex = 0;
+        document.getElementById("score-section").style.display = "none";
+        document.getElementById("theme-section").style.display = "block";
+
+        // Reset player counter display to 1/Y at the start of the new round
+        updatePlayerNumberDisplay();
+    }
+
+
+    // Reset scores
+    function resetScores() {
+        for (let player of players) {
+            scores[player.name] = 0;
+        }
+        displayScores();
+    }
+
+    // Reset everything
+    function resetAll() {
+        players = [];
+        scores = {};
+        document.getElementById("player-section").style.display = "block";
+        document.getElementById("theme-section").style.display = "none";
+        document.getElementById("roles-section").style.display = "none";
+        document.getElementById("score-section").style.display = "none";
+        document.getElementById("reset-section").style.display = "none";
+        document.getElementById("player-inputs").innerHTML = '';
+        addPlayerInput(); // Add first input back
+    }
+</script>
+
+</body>
+</html>
